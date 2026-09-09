@@ -1,22 +1,36 @@
+# 🩺 Auri Motion
 
-# [Auri Motion]
+> Aplicativo para agendamento de sessões, registro de conduta terapêutica e controle financeiro de atendimentos para fisioterapeutas e estudantes de fisioterapia.
 
-[Aplicativo para agendamento de sessões, registro de conduta terapêutica e controle financeiro de atendimentos para fisioterapeutas e estudantes de fisioterapia.]
+---
 
-## Autores
+## 📑 Documentação do Projeto
 
-- [Mery Helen de Souza - mery-helen]
+- 📋 **PRD:** [docs/prd.md](docs/prd.md)
+- 🔀 **User Flows:** [docs/user-flows.md](docs/user-flows.md)
+- 🎨 **Design Tokens:** [docs/design-tokens.md](docs/design-tokens.md)
 
-## Stack
+---
 
-[Preenchida a partir do `docs/architecture.md` — backend, frontend, banco.]
+## 👤 Autores
 
-## Em produção
+- **Mery Helen de Souza** — [@mery-helen](https://github.com/mery-helen)
 
-- **Aplicação:** [URL]
-- **API (Swagger):** [URL/docs]
+---
 
-## Quick Start
+## 🛠️ Stack
 
-[Como rodar localmente: pré-requisitos, variáveis de ambiente, comandos —
-gerado/refinado no `/utf-setup`.]
+*(A ser preenchida a partir do `docs/architecture.md` na próxima atividade — backend, frontend, banco)*
+
+---
+
+## 🚀 Em Produção
+
+- **Aplicação:** *(Pendente)*
+- **API (Swagger):** *(Pendente)*
+
+---
+
+## ⚡ Quick Start
+
+*(Instruções para rodar localmente serão geradas/refinadas no `/utf-setup`)*
