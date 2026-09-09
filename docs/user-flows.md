@@ -1,41 +1,53 @@
 # 🗺️ Jornadas de Usuário
 
-**Projeto:** [nome]
-**Versão:** 0.0.0 · esqueleto — preencha via `/utf-flows`
-**Última atualização:** [data]
+**Projeto:** Auri Motion  
+**Versão:** 1.0.0 · jornada inicial via `/utf-flows`  
+**Última atualização:** 2026-09-09  
 
 > 🤖 **Este documento é a fonte da verdade sobre O QUE A PESSOA VIVE na tela** —
 > o caminho do primeiro clique até o objetivo, e principalmente os pontos onde ela
 > trava, espera ou desiste.
->
-> ✍️ **Não preencha na mão:** rode `/utf-flows`. A entrevista escolhe a história que
-> merece o desenho, obriga o ponto de desistência a aparecer e cobra a decisão sobre
-> ele.
 >
 > 🚫 **Não duplique:** regra de negócio mora no `prd.md`; estado, entidade e contrato
 > moram no `architecture.md`. Aqui mora o caminho.
 
 ---
 
-## Jornada 1 — [nome da história]
+## Jornada 1 — Emissão e Confirmação de Cobrança do Atendimento
 
-**Story:** USnn
-**Critérios que ela marca:** [sai do site e volta · depende do tempo · depende de outra pessoa · pode ser abandonada]
+**Story:** US04 e US05  
+**Critérios que ela marca:** Sai do site e volta · Depende do tempo · Depende de outra pessoa agir · Pode ser abandonada no meio  
 
 ```mermaid
 flowchart TD
-    A(["início"]) --> B{"decisão do sistema"}
-    B -->|"sim"| C["«pessoa» faz algo"]
-    B -->|"não"| X1[["Some — e daí?"]]
+    A(["«fisioterapeuta» seleciona o atendimento e clica em Cobrar"]) --> B{"Sessão já possui cobrança paga ou em conflito?"}
+    B -->|"sim"| C["Sistema bloqueia duplicidade e avisa o profissional"]
+    B -->|"não"| D{"Valor informado é maior que zero?"}
+    D -->|"não"| E["Sistema destaca erro no valor"]
+    D -->|"sim"| F["Sistema gera a cobrança com status Pendente e o link/QR Code de pagamento"]
+    F --> G["«fisioterapeuta» copia e envia o link/instrução ao paciente"]
+    G --> H(["«paciente» acessa a tela de checkout externo"])
+    
+    H --> I{"O que o paciente faz?"}
+    I -->|"Fecha a aba ou abandona o checkout"| X1[["Nó Vermelho: Paciente abandona o checkout"]]
+    I -->|"Tenta pagar, mas a operadora recusa"| X2[["Nó Vermelho: Cartão recusado / Falha no pagamento"]]
+    I -->|"Conclui o pagamento com sucesso"| J["Solução de pagamentos envia confirmação assíncrona"]
+    
+    J --> K{"Notificação é autêntica e válida?"}
+    K -->|"não"| L["Sistema descarta mensagem e registra alerta de segurança"]
+    K -->|"sim"| M{"Evento já havia sido processado antes?"}
+    M -->|"sim (duplicata)"| N["Ignora idempotentemente sem alterar valores"]
+    M -->|"não"| O["Registra Pagamento e atualiza Cobrança para 'Pago'"]
+    O --> P(["«fisioterapeuta» visualiza status 'Pago' e quitação no histórico"])
 
     style X1 fill:#ffe0e0,stroke:#c62828
+    style X2 fill:#ffe0e0,stroke:#c62828
 ```
 
-**O que decidimos sobre o nó vermelho:**
+**O que decidimos sobre os nós vermelhos:**
 
-[Um parágrafo, com as palavras do aluno. O que o sistema faz quando a pessoa some ali?
-É este parágrafo que transforma o desenho em decisão de projeto — e é ele que o
-professor pede para explicar na defesa.]
+- **Abandono do checkout (X1):** Caso o paciente feche ou abandone a tela de checkout, a cobrança e o link/QR Code permanecem válidos por uma tolerância de 5 minutos, permitindo que o paciente retorne e conclua o pagamento sem necessidade de uma nova emissão. Expirado esse prazo de 5 minutos sem confirmação de pagamento, o status da cobrança é alterado automaticamente para "Expirado", evitando que registros fiquem pendentes indefinidamente.
+- **Cartão recusado / Falha no pagamento (X2):** Em caso de recusa pela operadora de pagamentos, o sistema atualiza o status da cobrança para "Falha no Pagamento" e notifica o fisioterapeuta na tela de detalhes da sessão, permitindo que ele cancele o registro ou reemita uma nova cobrança imediatamente.
 
 ---
 
@@ -43,3 +55,4 @@ professor pede para explicar na defesa.]
 
 | # | Dúvida | Onde ela precisa ser resolvida |
 | --- | --- | --- |
+| 1 | Mecanismo exato de expiração após os 5 minutos (job agendado em background, verificação sob demanda no acesso ou expiração nativa configurada no payload da sessão do gateway) | `/utf-architecture` |
