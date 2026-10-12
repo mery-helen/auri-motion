@@ -9,6 +9,7 @@
 - 📋 **PRD:** [docs/prd.md](docs/prd.md)
 - 🔀 **User Flows:** [docs/user-flows.md](docs/user-flows.md)
 - 🎨 **Design Tokens:** [docs/design-tokens.md](docs/design-tokens.md)
+- 🛠️ **Architecture:** [docs/architecture.md](docs/architecture.md)
 
 ---
 
@@ -20,8 +21,15 @@
 
 ## 🛠️ Stack
 
-*(A ser preenchida a partir do `docs/architecture.md` na próxima atividade — backend, frontend, banco)*
-
+| Camada | Tecnologia |
+| :--- | :--- |
+| **Backend** | NestJS |
+| **ORM** | Prisma ORM |
+| **Banco de Dados** | PostgreSQL (Neon.tech) |
+| **Frontend** | Angular |
+| **Estilização** | Tailwind CSS |
+| **Hospedagem** | Render (API) & Vercel (Web) |
+| **Integrações** | Mercado Pago (Sandbox) |
 ---
 
 ## 🚀 Em Produção
