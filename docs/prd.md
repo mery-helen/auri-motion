@@ -63,8 +63,7 @@
 ### US02 — Cadastro e Gestão de Pacientes com Comorbidades · `Must Have` · `M` · Status: `🟡 Ready`
 
 **Como** fisioterapeuta autenticado,  
-**eu quero** cadastrar, listar, visualizar e atualizar pacientes com seus dados pessoais e histórico de comorbidades,  
-**para que** eu mantenha um registro clínico centralizado e organizado de cada pessoa sob meus cuidados.
+**eu quero** cadastrar, listar, visualizar e atualizar pacientes com seus dados pessoais, queixa principal, histórico clínico e comorbidades, **para que** eu mantenha um registro clínico centralizado e organizado de cada pessoa sob meus cuidados.
 
 **Critérios de aceite:**
 - [ ] **Dado** que estou autenticado e informo nome completo, CPF, contato, data de nascimento e lista de comorbidades, **quando** salvo o cadastro, **então** o paciente é registrado com sucesso e vinculado exclusivamente à minha conta.
@@ -72,6 +71,7 @@
 - [ ] **Dado** que ainda não cadastrei nenhum paciente, **quando** consulto a listagem, **então** o sistema exibe um estado vazio (*empty state*) informando que nenhum paciente foi encontrado e sugerindo o primeiro cadastro.
 - [ ] **Dado** que tento cadastrar um paciente com campos obrigatórios em branco (ex.: sem nome ou CPF), **quando** submeto o formulário, **então** o sistema rejeita o cadastro e aponta os erros de preenchimento.
 - [ ] **Dado** que tento consultar, editar ou inativar um paciente que pertence a outro fisioterapeuta, **quando** realizo a ação, **então** o sistema nega o acesso e protege a privacidade dos dados.
+- [ ] **Dado** que estou autenticado e cadastro ou edito um paciente, **quando** preencho os campos opcionais "Queixa principal" e "Histórico Clínico" e salvo, **então** os dois textos são guardados no cadastro e aparecem no perfil do paciente, junto com as comorbidades.
 
 **Regras relacionadas:** RN01, RN03, RN09, RN12
 
