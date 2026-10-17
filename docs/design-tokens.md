@@ -1,8 +1,8 @@
 # 🎨 Tokens de Design
 
 **Projeto:** Auri Motion  
-**Versão:** 1.0.0 · tokens definidos via `/utf-design`  
-**Última atualização:** 2026-09-09  
+**Versão:** 1.1.0 · revisão da Entrega 1  
+**Última atualização:** 2026-10-17  
 
 > 🤖 **Este documento existe para a IA parar de inventar um botão diferente a cada
 > tela.** Não é um design system — é o mínimo que dá à prototipagem assistida algo a
@@ -74,16 +74,34 @@ Comportamento do botão de ação primária:
 | **Desabilitado** | Fundo `desabilitado` (`#E2E8F0`), texto `texto-desabilitado` (`#94A3B8`), cursor `not-allowed` | Bloqueio de submissão com dados inválidos ou pendentes |
 | **Carregando** | Fundo `acao-primaria` com opacidade 75%, spinner animado de progresso | Proteção contra cliques duplos que geram duplicidade de requisições |
 
+
+### 4.1. Cores de Status
+
+| Status | Token | Onde aparece |
+| :--- | :--- | :--- |
+| Agendado | `destaque-suave` | Badge do atendimento agendado |
+| Realizado | `sucesso` | Badge do atendimento concluído |
+| Cancelada | `perigo` | Badge de atendimento ou cobrança cancelada |
+| Pendente | `alerta` | Badge de cobrança aguardando pagamento |
+| Pago | `sucesso` | Badge de cobrança quitada |
+| Falhou | `perigo` | Badge de pagamento recusado |
+| Expirado | `texto-suave` sobre `desabilitado` | Badge de cobrança vencida (5 minutos) |
+
+Todos os badges usam a tipografia `caption`.
+
 ---
 
 ## 5. Protótipo
 
 **Link:** [https://stitch.google.com/projects/6967430572267739152](https://stitch.google.com/projects/6967430572267739152)
 **Telas previstas:**
-- Pacientes
+- Login e Cadastro
+- Pacientes (com estado vazio)
 - Cadastrar Paciente
-- Agendar Sessão
-- Cobrança _(nó vermelho)_
-- Emitir Cobrança
 - Perfil do Paciente
 - Editar Dados
+- Agendar Sessão (com erro de horário em conflito)
+- Registrar Atendimento (evolução e conduta terapêutica)
+- Detalhe da Sessão (cobrança Pendente, Pago, Falhou e Expirado; cancelar atendimento)
+- Emitir Cobrança (com erro de valor inválido)
+- Cobrança _(nó vermelho)_
