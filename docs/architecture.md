@@ -1,8 +1,8 @@
 # 🛠️ Architecture / Software Design Document
 
 **Projeto:** Auri Motion  
-**Versão:** 1.3.0 · definido via `/utf-architecture`  
-**Última atualização:** 2026-10-12  
+**Versão:** 1.4.0 · revisão da Entrega 1  
+**Última atualização:** 2026-10-17  
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -194,11 +194,20 @@ O `AppointmentsService` lê a cobrança por consulta de leitura via Prisma (`inc
 | Termo PRD (PT-BR) | Entidade técnica (EN) | Atributos principais |
 | :---------------- | :-------------------- | :------------------- |
 | Fisioterapeuta | `User` | `id`, `name`, `email`, `passwordHash`, `createdAt` |
-| Paciente | `Patient` | `id`, `userId` (FK), `name`, `cpf`, `birthDate`, `phone`, `chiefComplaint`, `clinicalHistory`, `comorbidities` (String[]), `isActive`, `createdAt` |
+| Paciente | `Patient` | `id`, `userId` (FK), `name`, `cpf`(único por `userId`, RN12), `birthDate`, `phone`, `chiefComplaint`, `clinicalHistory`, `comorbidities` (String[]), `isActive`, `createdAt` |
 | Comorbidade | _(coluna `comorbidities` em `Patient`)_ | Lista de textos armazenada diretamente no registro do paciente; sem entidade separada. |
-| Atendimento (Sessão) | `Appointment` | `id`, `patientId` (FK), `userId` (FK), `scheduledAt`, `durationMinutes` (padrão 60), `status` (`SCHEDULED` \| `COMPLETED`), `clinicalNotes`, `therapeuticConduct`, `sessionValue`, `createdAt`; conflito de horário detectado por sobreposição de `scheduledAt + durationMinutes`. |
+| Atendimento (Sessão) | `Appointment` | `id`, `patientId` (FK), `userId` (FK), `scheduledAt`, `durationMinutes` (padrão 60), `status` (`SCHEDULED` \| `COMPLETED` \| `CANCELED`), `clinicalNotes`, `therapeuticConduct`, `sessionValue`, `createdAt`; conflito de horário detectado por sobreposição de `scheduledAt + durationMinutes`. |
 | Cobrança (Pedido) | `Billing` | `id`, `appointmentId` (FK), `userId` (FK), `amount`, `status` (`PENDING` \| `PAID` \| `FAILED` \| `EXPIRED` \| `CANCELED`), `mpPaymentId` (UK), `qrCode`, `qrCodeBase64`, `paymentLink`, `expiresAt`, `createdAt` |
 | Pagamento | `Payment` | `id`, `billingId` (FK), `method`, `paidAt`, `amount`, `createdAt` |
+
+**Status no PRD × status no código**
+
+| Entidade | PRD (PT-BR) | Código (EN) |
+| :--- | :--- | :--- |
+| `Appointment` | Agendado · Realizado · Cancelada | `SCHEDULED` · `COMPLETED` · `CANCELED` |
+| `Billing` | Pendente · Pago · Falhou · Expirado · Cancelada | `PENDING` · `PAID` · `FAILED` · `EXPIRED` · `CANCELED` |
+
+**Regras de negócio que aparecem no diagrama:** `Appointment.durationMinutes` existe por causa da RN04 (conflito de agenda); `Billing.expiresAt` por causa da RN13 (expiração em 5 minutos); `Billing.mpPaymentId` é único por causa da RN08 (processamento único); e a relação `Appointment` 1:N `Billing` existe porque uma cobrança que falha ou expira é substituída por outra da mesma sessão.
 
 ### 📊 6.2. Diagrama ER (Mermaid)
 
@@ -356,6 +365,7 @@ docker compose up -d
 | 2026-10-11 | 1.1.0 | Ajustes: comorbidades em Patient, durationMinutes, enums corrigidos, dependências declaradas, CI sem secret, nota Atividade 08 |
 | 2026-10-12 | 1.2.0 | Linhas de versão e páginas consultadas no §2, correção de padrões CLI (Jest padrão no NestJS, oxlint confirmado, Vitest padrão no Angular), angular-eslint e @tailwindcss/postcss adicionados, docker-compose.yml no §3, tela Detalhe da Sessão isolada em appointments e justificativa de role registrada |
 | 2026-10-12 | 1.3.0 | §4.1 reduzido ao princípio; leitura de billing via Prisma include no backend; remoção completa de role (User, JWT, guards, ID9); Pix via Checkout Transparente (QR Code, copia-e-cola, ticket_url, mpPaymentId); testes da API retornados ao Jest com dependências declaradas (@nestjs/testing, ts-jest, supertest) e ID18/§8 ajustados; Appointment.status mantido |
+| 2026-10-17 | 1.4.0 | Revisão da Entrega 1: status CANCELED em Appointment (RN10), CPF único por fisioterapeuta (RN12), tabela de status PRD × código e regras de negócio que aparecem no ER |
 
 ---
 

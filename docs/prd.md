@@ -1,8 +1,8 @@
 # 📄 Product Requirements Document (PRD)
 
 **Projeto:** Auri Motion  
-**Versão:** 0.2.0 · ajustado via `/utf-prd`  
-**Última atualização:** 2026-09-09  
+**Versão:** 0.3.0 · revisão da Entrega 1  
+**Última atualização:** 2026-10-17  
 
 > 🤖 **Este documento é a fonte da verdade sobre o QUE o produto faz.** Regra de
 > negócio que não estiver aqui não existe — nem para a equipe, nem para a IA.
@@ -29,7 +29,7 @@
 | **Comorbidade** | Doença ou condição clínica pré-existente do paciente (ex.: diabetes, hipertensão) relevante para a conduta e o tratamento. | Queixa principal ou diagnóstico cinesiológico da sessão. |
 | **Conduta Terapêutica** | As técnicas, manobras, exercícios e procedimentos clínicos prescritos e aplicados ao paciente durante a sessão. | Evolução diária genérica ou prescrição médica de medicamentos. |
 | **Atendimento (Sessão)** | O encontro com data, horário e registro clínico onde o fisioterapeuta aplica a conduta no paciente. | O tratamento global/plano completo ou consulta médica. |
-| **Cobrança (Pedido)** | A emissão da ordem de pagamento a ser quitada pelo paciente referente a uma ou mais sessões de atendimento. | O pagamento efetivamente liquidado e confirmado. |
+| **Cobrança (Pedido)** | A emissão da ordem de pagamento a ser quitada pelo paciente referente a uma sessão de atendimento. | O pagamento efetivamente liquidado e confirmado. |
 | **Pagamento** | A transação financeira processada que liquida uma cobrança em aberto. | A cobrança/fatura ainda pendente de quitação. |
 
 ---
@@ -84,11 +84,12 @@
 **para que** eu acompanhe a evolução do tratamento e tenha um histórico claro dos procedimentos realizados.
 
 **Critérios de aceite:**
-- [ ] **Dado** que seleciono um paciente de minha carteira e informo data, horário e valor previsto, **quando** salvo o agendamento, **então** a sessão é criada vinculada àquele paciente com status inicial "Agendado".
+- [ ] **Dado** que seleciono um paciente de minha carteira e informo data, horário, duração (padrão de 60 minutos) e valor previsto, **quando** salvo o agendamento, **então** a sessão é criada vinculada àquele paciente com status inicial "Agendado".
 - [ ] **Dado** que um atendimento foi realizado, **quando** preencho a evolução do paciente e a conduta terapêutica adotada (exercícios, manobras, técnicas aplicadas), **então** o atendimento é salvo com status "Realizado" e fica registrado no histórico do paciente.
 - [ ] **Dado** que consulto o perfil de um paciente, **quando** abro a aba de atendimentos, **então** vejo a lista de todas as suas sessões em ordem cronológica (da mais recente para a mais antiga).
 - [ ] **Dado** que tento agendar uma sessão com horário em conflito com outro agendamento já existente na minha agenda, **quando** tento salvar, **então** o sistema avisa o conflito e impede a sobreposição de horários.
 - [ ] **Dado** que tento vincular um atendimento a um paciente pertencente a outro fisioterapeuta, **quando** envio a solicitação, **então** o sistema rejeita a operação com erro de autorização.
+- [ ] **Dado** que tenho um atendimento com status "Agendado", **quando** o cancelo, **então** ele passa para "Cancelada", o horário volta a ficar livre na minha agenda e nenhuma nova cobrança pode ser emitida para ele.
 
 **Regras relacionadas:** RN01, RN03, RN04, RN10
 
@@ -106,8 +107,10 @@
 - [ ] **Dado** que tento gerar uma cobrança com valor zerado ou negativo, **quando** envio a solicitação, **então** o sistema impede a emissão informando que o valor deve ser maior que zero.
 - [ ] **Dado** que uma sessão já possui uma cobrança quitada com status "Pago", **quando** tento emitir uma nova cobrança para ela, **então** o sistema bloqueia a duplicidade informando que a sessão já foi paga.
 - [ ] **Dado** que ocorra uma indisponibilidade na solução de pagamentos durante a geração, **quando** a operação falha, **então** o sistema não registra a cobrança como emitida e exibe mensagem amigável informando a impossibilidade momentânea.
+- [ ] **Dado** que a sessão já possui uma cobrança "Pendente", **quando** tento emitir outra, **então** o sistema bloqueia a emissão e informa que já existe uma cobrança em aberto.
+- [ ] **Dado** que uma cobrança está "Falhou" ou "Expirado", **quando** acesso os detalhes da sessão, **então** posso cancelá-la (status "Cancelada") ou emitir uma nova cobrança para a mesma sessão.
 
-**Regras relacionadas:** RN01, RN05, RN06
+**Regras relacionadas:** RN01, RN05, RN06, RN13
 
 ---
 
@@ -123,8 +126,9 @@
 - [ ] **Dado** que uma notificação chegue com origem duvidosa ou sem validação de autenticidade, **quando** o sistema recebe a mensagem, **então** ele rejeita a alteração, mantém a cobrança como pendente e registra o alerta.
 - [ ] **Dado** que a solução de pagamentos reenvie a confirmação de um pagamento já processado anteriormente, **quando** a mensagem é recebida, **então** o sistema ignora a duplicidade mantendo o status "Pago" sem duplicar lançamentos.
 - [ ] **Dado** que a solução de pagamentos notifique a recusa ou expiração do pagamento, **quando** a mensagem é processada, **então** a cobrança é atualizada para "Falhou" ou "Expirado", permitindo gerar uma nova cobrança.
+- [ ] **Dado** que uma cobrança "Pendente" completa 5 minutos sem confirmação de pagamento, **quando** o prazo termina, **então** ela passa automaticamente para "Expirado".
 
-**Regras relacionadas:** RN06, RN07, RN08, RN11
+**Regras relacionadas:** RN06, RN07, RN08, RN11, RN13
 
 ---
 
@@ -135,15 +139,16 @@
 | **RN01** | **Isolamento de Dados por Usuário:** Todo paciente, sessão e cobrança pertencem exclusivamente ao fisioterapeuta que o cadastrou. Nenhum usuário pode visualizar ou modificar dados de terceiros. | US01, US02, US03, US04 |
 | **RN02** | **Unicidade de Identificação:** Não é permitido criar mais de uma conta de fisioterapeuta com o mesmo endereço de e-mail. | US01 |
 | **RN03** | **Vínculo Clínico Obrigatório:** Uma conduta terapêutica e um atendimento só podem existir vinculados a um paciente cadastrado; não existem registros clínicos órfãos. | US02, US03 |
-| **RN04** | **Bloqueio de Conflito de Agenda:** Não é permitido agendar sessões com horários concorrentes ou sobrepostos para o mesmo fisioterapeuta. | US03 |
+| **RN04** | **Bloqueio de Conflito de Agenda:** Não é permitido agendar sessões com horários concorrentes ou sobrepostos para o mesmo fisioterapeuta; o conflito considera o horário de início somado à duração de cada sessão. | US03 |
 | **RN05** | **Valor Mínimo da Cobrança:** Toda cobrança gerada deve ter valor monetário estritamente maior que zero. | US04 |
 | **RN06** | **Imutabilidade de Cobrança Liquidada:** Uma vez que uma cobrança atinge o status "Pago", ela não pode ser alterada, recalculada ou reemitida para a mesma sessão. | US04, US05 |
 | **RN07** | **Validação da Origem do Pagamento:** Notificações de pagamento só alteram o status da cobrança se a autenticidade da origem da solução de pagamentos for confirmada. Mensagens não autenticadas são descartadas. | US05 |
 | **RN08** | **Processamento Único de Pagamento:** Notificações repetidas relativas a um mesmo evento de pagamento devem ser processadas apenas uma vez, impedindo duplicidade de recebimentos ou alteração de valores. | US05 |
 | **RN09** | **Proteção do Histórico (Inativação de Pacientes):** Pacientes com histórico de atendimentos ou cobranças não podem ser excluídos do sistema, apenas inativados, preservando o histórico clínico e financeiro. | US02 |
 | **RN10** | **Gestão de Cancelamento de Sessão:** Cancelamentos de atendimentos liberam o horário na agenda do fisioterapeuta e marcam a sessão como "Cancelada", impedindo a emissão de novas cobranças para aquele agendamento. | US03 |
-| **RN11** | **Registro de Estornos:** Caso uma cobrança já paga precise ser devolvida ao paciente, o evento deve ser registrado como um lançamento de estorno/reembolso vinculado, mantendo a cobrança original imutável. | US05 |
+| **RN11** | **Estorno Fora do Sistema:** O sistema não registra estornos nem reembolsos. Uma cobrança "Pago" permanece imutável; qualquer devolução ao paciente acontece fora do aplicativo. | US05 |
 | **RN12** | **Unicidade de Paciente por Fisioterapeuta:** Não é permitido cadastrar dois pacientes com o mesmo CPF na carteira de um mesmo fisioterapeuta. | US02 |
+| **RN13** | **Expiração da Cobrança:** Toda cobrança "Pendente" expira 5 minutos após a emissão e passa para "Expirado". Uma cobrança "Falhou" ou "Expirado" pode ser cancelada ou substituída por uma nova cobrança da mesma sessão. | US04, US05 |
 
 ---
 
@@ -154,6 +159,7 @@
 - **Prescrição e Venda de Medicamentos:** O sistema é focado estritamente na prática e conduta fisioterapêutica, não englobando módulo farmacológico.
 - **Portal de Acesso do Paciente:** O paciente não possui login ou acesso ao aplicativo; ele apenas recebe o link de pagamento.
 - **Chat ou Mensagens em Tempo Real:** O aplicativo não terá sistema interno de troca de mensagens instantâneas entre profissional e paciente.
+- **Estorno e Reembolso:** O sistema não registra a devolução de valores já pagos; a cobrança "Pago" permanece imutável (RN11).
 
 ---
 
@@ -172,3 +178,4 @@
 | :--- | :----- | :---------- |
 | 2026-09-09 | 0.1.0 | Rascunho inicial via `/utf-prd` |
 | 2026-09-09 | 0.2.0 | Ajuste de vocabulário de negócio (remoção de termos de arquitetura/tecnologia), promoção das User Stories para `🟡 Ready`, adição das Regras de Negócio (RN01 a RN12), Fora de Escopo e Requisitos Não Funcionais |
+| 2026-10-17 | 0.3.0 | Revisão da Entrega 1: cobrança de uma sessão, duração e cancelamento de sessão, reemissão e cancelamento de cobrança, nova RN13 (expiração em 5 min), estorno movido para Fora de Escopo (RN11 reescrita) |

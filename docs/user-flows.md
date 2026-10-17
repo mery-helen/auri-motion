@@ -1,8 +1,8 @@
 # 🗺️ Jornadas de Usuário
 
 **Projeto:** Auri Motion  
-**Versão:** 1.0.0 · jornada inicial via `/utf-flows`  
-**Última atualização:** 2026-09-09  
+**Versão:** 1.1.0 · revisão da Entrega 1  
+**Última atualização:** 2026-10-17  
 
 > 🤖 **Este documento é a fonte da verdade sobre O QUE A PESSOA VIVE na tela** —
 > o caminho do primeiro clique até o objetivo, e principalmente os pontos onde ela
@@ -20,7 +20,7 @@
 
 ```mermaid
 flowchart TD
-    A(["«fisioterapeuta» seleciona o atendimento e clica em Cobrar"]) --> B{"Sessão já possui cobrança paga ou em conflito?"}
+    A(["«fisioterapeuta» seleciona o atendimento e clica em Cobrar"]) --> B{"Sessão já possui cobrança paga ou pendente?"}
     B -->|"sim"| C["Sistema bloqueia duplicidade e avisa o profissional"]
     B -->|"não"| D{"Valor informado é maior que zero?"}
     D -->|"não"| E["Sistema destaca erro no valor"]
@@ -30,7 +30,7 @@ flowchart TD
     
     H --> I{"O que o paciente faz?"}
     I -->|"Fecha a aba ou abandona o checkout"| X1[["Nó Vermelho: Paciente abandona o checkout"]]
-    I -->|"Tenta pagar, mas a operadora recusa"| X2[["Nó Vermelho: Cartão recusado / Falha no pagamento"]]
+    I -->|"Tenta pagar, mas o pagamento é recusado"| X2[["Nó Vermelho: Pagamento Pix recusado ou não concluído"]]
     I -->|"Conclui o pagamento com sucesso"| J["Solução de pagamentos envia confirmação assíncrona"]
     
     J --> K{"Notificação é autêntica e válida?"}
@@ -47,7 +47,7 @@ flowchart TD
 **O que decidimos sobre os nós vermelhos:**
 
 - **Abandono do checkout (X1):** Caso o paciente feche ou abandone a tela de checkout, a cobrança e o link/QR Code permanecem válidos por uma tolerância de 5 minutos, permitindo que o paciente retorne e conclua o pagamento sem necessidade de uma nova emissão. Expirado esse prazo de 5 minutos sem confirmação de pagamento, o status da cobrança é alterado automaticamente para "Expirado", evitando que registros fiquem pendentes indefinidamente.
-- **Cartão recusado / Falha no pagamento (X2):** Em caso de recusa pela operadora de pagamentos, o sistema atualiza o status da cobrança para "Falha no Pagamento" e notifica o fisioterapeuta na tela de detalhes da sessão, permitindo que ele cancele o registro ou reemita uma nova cobrança imediatamente.
+- **Pagamento recusado ou não concluído (X2):** Em caso de recusa pela solução de pagamentos, o sistema atualiza o status da cobrança para "Falhou" e mostra o aviso na tela de detalhes da sessão, permitindo que o fisioterapeuta cancele a cobrança ou emita uma nova imediatamente.
 
 ---
 
@@ -55,4 +55,4 @@ flowchart TD
 
 | # | Dúvida | Onde ela precisa ser resolvida |
 | --- | --- | --- |
-| 1 | Mecanismo exato de expiração após os 5 minutos (job agendado em background, verificação sob demanda no acesso ou expiração nativa configurada no payload da sessão do gateway) | `/utf-architecture` |
+| 1 | ✅ **Resolvida:** a expiração é feita por job agendado (`@Cron` a cada 1 minuto) que passa cobranças `PENDING` vencidas para `EXPIRED`. | `architecture.md` §2.4 |

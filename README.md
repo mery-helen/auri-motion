@@ -10,6 +10,13 @@
 - 🔀 **User Flows:** [docs/user-flows.md](docs/user-flows.md)
 - 🎨 **Design Tokens:** [docs/design-tokens.md](docs/design-tokens.md)
 - 🛠️ **Architecture:** [docs/architecture.md](docs/architecture.md)
+- ✅ **Checklist:** [docs/checklist.md](docs/checklist.md)
+
+---
+
+## 🎨 Protótipo
+
+- **Protótipo (Stitch):** https://stitch.google.com/projects/6967430572267739152
 
 ---
 
@@ -30,15 +37,15 @@
 | **Estilização** | Tailwind CSS |
 | **Hospedagem** | Render (API) & Vercel (Web) |
 | **Integrações** | Mercado Pago (Sandbox) |
----
-
-## 🚀 Em Produção
-
-- **Aplicação:** *(Pendente)*
-- **API (Swagger):** *(Pendente)*
 
 ---
 
 ## ⚡ Quick Start
 
-*(Instruções para rodar localmente serão geradas/refinadas no `/utf-setup`)*
+*A partir da Entrega 2.*
+
+---
+
+## 🚀 Em produção
+
+*A partir da Entrega 3.*
