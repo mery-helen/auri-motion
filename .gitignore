@@ -35,3 +35,5 @@ Thumbs.db
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Prisma (cliente gerado)
+apps/api/generated/
