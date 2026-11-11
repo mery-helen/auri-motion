@@ -36,7 +36,7 @@
 | Camada | Tecnologia | Versão | Página consultada | Problema que resolve |
 | :----- | :--------- | :----- | :---------------- | :------------------- |
 | **Backend** | NestJS (`@nestjs/core`) | 12+ | [docs.nestjs.com](https://docs.nestjs.com/) · [npmjs](https://www.npmjs.com/package/@nestjs/core) | Framework para APIs Node.js com arquitetura modular, DI e CLI oficial |
-| **ORM** | Prisma ORM (`prisma`, `@prisma/client`) | 7+ | [prisma.io/docs](https://www.prisma.io/docs) · [npmjs](https://www.npmjs.com/package/prisma) | Mapeamento objeto-relacional, migrações e type-safety do PostgreSQL (linha 7+ estável; v8 em RC) |
+| **ORM** | Prisma ORM (`prisma`, `@prisma/client`) | 7.x (fixado) | [prisma.io/docs](https://www.prisma.io/docs) · [npmjs](https://www.npmjs.com/package/prisma) | Mapeamento objeto-relacional, migrações e type-safety do PostgreSQL (linha 7+ estável; o latest do npm aponta para a v8 em RC, cujo init é incompatível com este projeto) |
 | **Banco relacional** | PostgreSQL | 16+ | [postgresql.org/docs](https://www.postgresql.org/docs/16/) | Banco relacional com suporte completo a transações ACID |
 | **Frontend** | Angular (`@angular/core`) | 22+ | [angular.dev](https://angular.dev/) · [npmjs](https://www.npmjs.com/package/@angular/core) | Framework SPA com signals reativos, standalone nativo e roteamento lazy |
 | **Estilo** | Tailwind CSS (`tailwindcss`) | 4+ | [tailwindcss.com/docs](https://tailwindcss.com/docs) · [npmjs](https://www.npmjs.com/package/tailwindcss) | CSS utilitário CSS-first, configurado via `@theme` no CSS |
@@ -46,7 +46,10 @@
 | **Cobertura de testes (API)** | `@vitest/coverage-v8` | 4+ | [vitest.dev/guide/coverage](https://vitest.dev/guide/coverage.html) · [npmjs](https://www.npmjs.com/package/@vitest/coverage-v8) | Provedor de cobertura de código V8 nativo para o Vitest no NestJS |
 | **Testes E2E (API)** | `supertest` | 7+ | [github.com/supertest](https://github.com/ladjs/supertest) · [npmjs](https://www.npmjs.com/package/supertest) | Abstração sobre requisições HTTP para teste de endpoints da API sem subir porta de rede real |
 | **Lint (API)** | oxlint (`oxlint`) | 1+ | [oxc.rs/docs](https://oxc.rs/docs/guide/usage/linter.html) · [github.com/nestjs/schematics](https://github.com/nestjs/schematics) | Linter padrão oficial gerado pelo NestJS 12 CLI (`.oxlintrc.json`), executado em Rust com suporte type-aware |
-| **Testes (Web)** | Vitest (`vitest`) | 5+ | [angular.dev/guide/testing](https://angular.dev/guide/testing) · [vitest.dev](https://vitest.dev/) | Suíte de testes unitários padrão e recomendada pelo Angular CLI (substitui o Karma descontinuado) |
+| **Formato de módulos (API)** | ESM (`"type": "module"`) | — | [docs.nestjs.com](https://docs.nestjs.com/) · [nodejs.org/api/esm.html](https://nodejs.org/api/esm.html) | Padrão do gerador oficial do NestJS 12, com extensão `.js` nos imports locais |
+| **Build e deploy (API)** | `@nestjs/mau` | 0.2+ | [npmjs.com/package/@nestjs/mau](https://www.npmjs.com/package/@nestjs/mau) | Vindo do gerador oficial do NestJS 12 (script `deploy`), não usado no semestre |
+| **Driver PostgreSQL (Prisma)** | `@prisma/adapter-pg`, `pg`, `dotenv` | 7.10+ / 8.23+ / 17.4+ | [prisma.io/docs](https://www.prisma.io/docs) · [npmjs](https://www.npmjs.com/package/@prisma/adapter-pg) | O Prisma 7 não traz o motor de conexão embutido e a CLI não lê o `.env` sozinha |
+| **Testes (Web)** | Vitest (`vitest`) | 5.x | [angular.dev/guide/testing](https://angular.dev/guide/testing) · [vitest.dev](https://vitest.dev/) | Suíte de testes unitários padrão e recomendada pelo Angular CLI (substitui o Karma descontinuado) |
 | **Lint (Web)** | `angular-eslint` | 22+ | [angular-eslint/github](https://github.com/angular-eslint/angular-eslint) · [angular.dev/style-guide](https://angular.dev/style-guide) | Ferramenta oficial do ecossistema Angular executada pelo comando `ng lint` para análise estática de TypeScript e templates |
 | **Gateway de pagamento** | Mercado Pago SDK (`mercadopago`) | 3+ | [mercadopago.com.br/pix](https://www.mercadopago.com.br/developers/pt/docs/checkout-api/integration-configuration/integrate-with-pix) · [npmjs](https://www.npmjs.com/package/mercadopago) | Emissão de pagamentos Pix via Checkout Transparente (Payments API no servidor com QR Code base64, Pix Copia e Cola, link e expiração em 5 minutos) e recepção de webhooks |
 | **Job scheduler** | `@nestjs/schedule` | 12+ | [docs.nestjs.com/task-scheduling](https://docs.nestjs.com/techniques/task-scheduling) · [npmjs](https://www.npmjs.com/package/@nestjs/schedule) | Cron jobs no NestJS para expiração automática de cobranças (`@Cron`) |
@@ -106,17 +109,32 @@ Job agendado com `@nestjs/schedule` (`@Cron` a cada 1 minuto) que consulta cobra
 
 ```text
 .
-├── .agents/               # constituição, workflows e prompts dos agentes (§1)
-├── .claude/ .cursor/ .opencode/   # cascas de cada ferramenta — só apontam para .agents/
-├── .github/               # template de PR e o Portão de Entendimento
-├── CLAUDE.md  AGENTS.md   # carregam a constituição em toda sessão
-├── README.md              # a vitrine: o que é e como rodar
-├── docker-compose.yml     # orquestração de containers locais (PostgreSQL 16)
-├── docs/                  # prd.md, user-flows.md, design-tokens.md, este arquivo, checklist.md e guias
-├── specs/                 # uma pasta por história implementada
+├── .agents/                    # constituição, workflows e prompts dos agentes (§1)
+├── .claude/ .cursor/ .opencode/ # cascas de cada ferramenta — só apontam para .agents/
+├── .github/                    # template de PR e o Portão de Entendimento
+├── .gitattributes              # normalização universal de quebra de linha (LF)
+├── .gitignore                  # único, na raiz (cobre node_modules, build, .env e generated)
+├── package.json                # orquestrador: workspaces ("apps/*") e scripts com -w
+├── package-lock.json           # único, na raiz
+├── CLAUDE.md  AGENTS.md        # carregam a constituição em toda sessão
+├── README.md                   # a vitrine: o que é e como rodar
+├── docker-compose.yml          # orquestração de containers locais (PostgreSQL 16)
+├── docs/                       # prd.md, user-flows.md, design-tokens.md, este arquivo, checklist.md e guias
+├── specs/                      # uma pasta por história implementada (índice README.md)
 └── apps/
-    ├── api/               # NestJS 12 — backend, Prisma, JWT, Swagger, webhooks
-    └── web/               # Angular 22 — frontend, Tailwind CSS 4, SPA
+    ├── api/                    # NestJS 12 — backend, Prisma, JWT, Swagger, webhooks
+    │   ├── .env                # fora do Git (credenciais locais)
+    │   ├── .env.example        # modelo de variáveis de ambiente
+    │   ├── .oxlintrc.json      # linter type-aware da API
+    │   ├── .prettierrc         # formatação de código
+    │   ├── prisma.config.ts    # configuração do Prisma 7 (adapter-pg e dotenv)
+    │   ├── prisma/             # schema.prisma inicial (sem models de negócio)
+    │   ├── src/                # arquitetura em módulos (§5)
+    │   └── package.json        # dependências e scripts da API
+    └── web/                    # Angular 22 — frontend, Tailwind CSS 4, SPA
+        ├── .prettierrc         # formatação de código
+        ├── src/                # arquitetura em features (§4)
+        └── package.json        # dependências e scripts do frontend
 ```
 
 ---
@@ -371,7 +389,7 @@ docker compose up -d
 | 2026-10-12 | 1.2.0 | Linhas de versão e páginas consultadas no §2, correção de padrões CLI (Jest padrão no NestJS, oxlint confirmado, Vitest padrão no Angular), angular-eslint e @tailwindcss/postcss adicionados, docker-compose.yml no §3, tela Detalhe da Sessão isolada em appointments e justificativa de role registrada |
 | 2026-10-12 | 1.3.0 | §4.1 reduzido ao princípio; leitura de billing via Prisma include no backend; remoção completa de role (User, JWT, guards, ID9); Pix via Checkout Transparente (QR Code, copia-e-cola, ticket_url, mpPaymentId); testes da API retornados ao Jest com dependências declaradas (@nestjs/testing, ts-jest, supertest) e ID18/§8 ajustados; Appointment.status mantido |
 | 2026-10-17 | 1.4.0 | Revisão da Entrega 1: status CANCELED em Appointment (RN10), CPF único por fisioterapeuta (RN12), tabela de status PRD × código e regras de negócio que aparecem no ER |
-| 2026-11-11 | 1.5.0 | Ratificação pós-setup: Vitest oficial do NestJS 12 CLI, ESM nativo, npm workspaces na raiz e scripts com `-w apps/x` |
+| 2026-11-11 | 1.5.0 | Ratificação pós-setup: ESM, Vitest e oxlint do gerador oficial do NestJS 12; @nestjs/mau vindo do gerador; npm workspaces com package-lock.json único e scripts -w apps/x; Prisma fixado na linha 7; @prisma/adapter-pg, pg e dotenv declarados; .gitignore único na raiz cobrindo apps/api/generated/; PostgreSQL em Docker sem nenhuma tabela |
 
 ---
 
