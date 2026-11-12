@@ -1,6 +1,6 @@
 ---
 issue: 1
-status: rascunho   # rascunho | aprovada
+status: aprovada   # rascunho | aprovada
 ---
 
 # US01 — Cadastro e Autenticação do Fisioterapeuta
