@@ -15,7 +15,7 @@
 
 ## Tarefas
 
-- [ ] **Tarefa 1 — Criar model `User` e migration Prisma**
+- [x] **Tarefa 1 — Criar model `User` e migration Prisma**
   - Cobre: passo técnico — destrava todas as tarefas de backend
   - Teste primeiro: teste de integração que conecta ao banco de teste, executa a migration e verifica que a tabela `User` existe com a constraint unique em `email`; falha enquanto o model não existir no schema.
   - Arquivos previstos:
