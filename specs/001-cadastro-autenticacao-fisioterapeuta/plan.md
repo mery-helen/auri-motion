@@ -22,7 +22,7 @@
     - `apps/api/prisma/schema.prisma` (model `User`)
     - migration gerada em `apps/api/prisma/migrations/`
 
-- [ ] **Tarefa 2 — Endpoint `POST /auth/register` (cadastro + caminhos tristes)**
+- [x] **Tarefa 2 — Endpoint `POST /auth/register` (cadastro + caminhos tristes)**
   - Cobre: CA1 (conta criada, senha não em texto puro), CA4 (e-mail duplicado), CA5 (campos obrigatórios), CA6 (formato inválido e senha fraca)
   - Teste primeiro: testes unitários do `AuthService.register()` — (a) cadastro válido retorna dados do usuário sem passwordHash; (b) e-mail duplicado lança conflito; (c) campos obrigatórios ausentes são rejeitados pelo DTO antes de chegar ao service; (d) senha que não atende os critérios de força é rejeitada. Todos falham enquanto o service e o DTO não existirem.
   - Arquivos previstos:
