@@ -1,4 +1,6 @@
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
@@ -14,12 +16,36 @@ type PrismaMock = {
   };
 };
 
+type JwtServiceMock = {
+  signAsync: ReturnType<typeof vi.fn>;
+};
+
+type ConfigServiceMock = {
+  get: ReturnType<typeof vi.fn>;
+};
+
 function createPrismaMock(): PrismaMock {
   return {
     user: {
       findUnique: vi.fn(),
       create: vi.fn(),
     },
+  };
+}
+
+function createJwtServiceMock(): JwtServiceMock {
+  return { signAsync: vi.fn() };
+}
+
+function createConfigServiceMock(): ConfigServiceMock {
+  const values: Record<string, string> = {
+    JWT_SECRET: 'test-secret',
+    JWT_EXPIRES_IN: '3600',
+  };
+
+  return {
+    get: vi.fn((key: string) => values[key]),
+    getOrThrow: vi.fn((key: string) => values[key]),
   };
 }
 
@@ -41,7 +67,11 @@ describe('AuthService.register', () => {
 
   beforeEach(() => {
     prisma = createPrismaMock();
-    service = new AuthService(prisma as unknown as PrismaService);
+    service = new AuthService(
+      prisma as unknown as PrismaService,
+      createJwtServiceMock() as unknown as JwtService,
+      createConfigServiceMock() as unknown as ConfigService,
+    );
   });
 
   it('creates an account and returns the user without passwordHash', async () => {
@@ -100,6 +130,87 @@ describe('AuthService.register', () => {
     await expect(service.register(validPayload)).rejects.toBeInstanceOf(ConflictException);
     expect(prisma.user.findUnique).toHaveBeenCalledTimes(1);
     expect(prisma.user.create).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('AuthService.login', () => {
+  let prisma: PrismaMock;
+  let jwtService: JwtServiceMock;
+  let configService: ConfigServiceMock;
+  let service: AuthService;
+  let passwordHash: string;
+
+  const createdAt = new Date('2026-01-01T00:00:00.000Z');
+  const validPayload = {
+    email: 'ana@example.com',
+    password: 'Senha@123',
+  };
+
+  beforeAll(async () => {
+    passwordHash = await bcrypt.hash(validPayload.password, 10);
+  });
+
+  beforeEach(() => {
+    prisma = createPrismaMock();
+    jwtService = createJwtServiceMock();
+    configService = createConfigServiceMock();
+    service = new AuthService(
+      prisma as unknown as PrismaService,
+      jwtService as unknown as JwtService,
+      configService as unknown as ConfigService,
+    );
+  });
+
+  it('returns an access token and a one-hour expiry for valid credentials', async () => {
+    prisma.user.findUnique.mockResolvedValue({
+      id: 'user-1',
+      name: 'Ana Fisioterapeuta',
+      email: validPayload.email,
+      passwordHash,
+      createdAt,
+    });
+    jwtService.signAsync.mockResolvedValue('signed-token');
+
+    const result = await service.login(validPayload);
+
+    expect(result).toEqual({ accessToken: 'signed-token', expiresIn: 3600 });
+    expect(jwtService.signAsync).toHaveBeenCalledWith(
+      { sub: 'user-1' },
+      { expiresIn: '3600' },
+    );
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { email: validPayload.email },
+    });
+  });
+
+  it('uses the same generic message for an unknown e-mail and a wrong password', async () => {
+    prisma.user.findUnique.mockResolvedValueOnce(null);
+
+    const unknownEmailError = await service
+      .login({ email: 'missing@example.com', password: validPayload.password })
+      .catch((error: unknown) => error);
+
+    prisma.user.findUnique.mockResolvedValueOnce({
+      id: 'user-1',
+      name: 'Ana Fisioterapeuta',
+      email: validPayload.email,
+      passwordHash,
+      createdAt,
+    });
+
+    const wrongPasswordError = await service
+      .login({ email: validPayload.email, password: 'Wrong@123' })
+      .catch((error: unknown) => error);
+
+    expect(unknownEmailError).toBeInstanceOf(UnauthorizedException);
+    expect(wrongPasswordError).toBeInstanceOf(UnauthorizedException);
+    expect((unknownEmailError as UnauthorizedException).message).toBe(
+      'Credenciais inválidas',
+    );
+    expect((wrongPasswordError as UnauthorizedException).message).toBe(
+      (unknownEmailError as UnauthorizedException).message,
+    );
+    expect(jwtService.signAsync).not.toHaveBeenCalled();
   });
 });
 

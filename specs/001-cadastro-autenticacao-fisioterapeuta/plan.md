@@ -33,7 +33,7 @@
     - `apps/api/src/modules/auth/auth.service.spec.ts`
     - `apps/api/src/modules/auth/auth.controller.spec.ts` (e2e do endpoint)
 
-- [ ] **Tarefa 3 — Endpoint `POST /auth/login` + estratégia JWT**
+- [x] **Tarefa 3 — Endpoint `POST /auth/login` + estratégia JWT**
   - Cobre: CA2 (autenticação válida retorna token com expiração de 1h), CA3 (credenciais inválidas → mensagem genérica)
   - Teste primeiro: testes unitários do `AuthService.login()` — (a) credenciais corretas retornam `accessToken` e `expiresIn`; (b) e-mail inexistente retorna a mesma mensagem que senha errada (sem especificar qual campo falhou). Falham enquanto o service não implementar o login.
   - Arquivos previstos:

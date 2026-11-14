@@ -1,8 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, UnauthorizedException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 
 export type RegisteredUser = {
   id: string;
@@ -15,7 +18,11 @@ const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async register(dto: RegisterDto): Promise<RegisteredUser> {
     const existingUser = await this.prisma.user.findUnique({
@@ -53,5 +60,25 @@ export class AuthService {
 
       throw error;
     }
+  }
+
+  async login(dto: LoginDto): Promise<{ accessToken: string; expiresIn: number }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    const expiresIn = this.configService.getOrThrow('JWT_EXPIRES_IN');
+    const accessToken = await this.jwtService.signAsync(
+      { sub: user.id },
+      {
+        expiresIn,
+      },
+    );
+
+    return { accessToken, expiresIn: Number(expiresIn) };
   }
 }
