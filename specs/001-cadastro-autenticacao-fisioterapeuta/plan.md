@@ -76,6 +76,21 @@
     - `apps/web/src/app/core/guards/guest.guard.spec.ts`
     - `apps/web/src/app/core/interceptors/jwt.interceptor.spec.ts`
 
+- [ ] **Tarefa 7 — Corrigir `expiresIn` do JWT (sessão de 1h de verdade)**
+  - Cobre: CA2 (sessão de 1h) — pendência 1 da auditoria final
+  - Teste primeiro: teste que decodifica o token emitido por `AuthService.login()` e confere `exp − iat = 3600` (com `JwtService` real, não mockado); falha enquanto `JWT_EXPIRES_IN` for lido como string sem conversão de unidade.
+  - Arquivos previstos:
+    - `apps/api/src/modules/auth/auth.service.ts` (`expiresIn` como número de segundos, de forma inequívoca)
+    - `apps/api/src/modules/auth/auth.module.ts` (`signOptions` com o mesmo número)
+    - `apps/api/.env.example` (`JWT_EXPIRES_IN=3600` com comentário/documentação da unidade: segundos)
+    - `apps/api/src/modules/auth/auth.service.spec.ts` e/ou `apps/api/src/modules/auth/auth.controller.spec.ts` (onde couber o teste de `exp − iat`)
+
+- [ ] **Tarefa 8 — Alinhar `docs/architecture.md` ao código real**
+  - Cobre: pendência 2 da auditoria final (documentação) — não é critério de aceite
+  - Teste primeiro: sem testes — tarefa de documentação; a verificação é a leitura do auditor final.
+  - Arquivos previstos:
+    - `docs/architecture.md` (Prisma `schema.prisma` com model `User`; `AuthService` em `features/auth/` e não em `core/`; `Exception Filter` global, Swagger em `/docs` e `validationSchema` (Joi) no `ConfigModule` marcados como ainda não implementados)
+
 ## Critérios sem tarefa
 
 _(Vazio — todos os CAs cobertos.)_
