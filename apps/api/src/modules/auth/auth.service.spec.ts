@@ -176,7 +176,7 @@ describe('AuthService.login', () => {
     expect(result).toEqual({ accessToken: 'signed-token', expiresIn: 3600 });
     expect(jwtService.signAsync).toHaveBeenCalledWith(
       { sub: 'user-1' },
-      { expiresIn: '3600' },
+      { expiresIn: 3600 },
     );
     expect(prisma.user.findUnique).toHaveBeenCalledWith({
       where: { email: validPayload.email },

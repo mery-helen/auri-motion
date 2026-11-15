@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
+import { parseJwtExpiresInSeconds } from './jwt-expires-in.js';
 
 export type RegisteredUser = {
   id: string;
@@ -71,7 +72,9 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    const expiresIn = this.configService.getOrThrow('JWT_EXPIRES_IN');
+    const expiresIn = parseJwtExpiresInSeconds(
+      this.configService.getOrThrow('JWT_EXPIRES_IN'),
+    );
     const accessToken = await this.jwtService.signAsync(
       { sub: user.id },
       {
@@ -79,6 +82,6 @@ export class AuthService {
       },
     );
 
-    return { accessToken, expiresIn: Number(expiresIn) };
+    return { accessToken, expiresIn };
   }
 }

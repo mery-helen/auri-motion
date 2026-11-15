@@ -176,6 +176,29 @@ describe('AuthController (e2e)', () => {
     expect(payload).toMatchObject({ sub: 'user-1' });
   });
 
+  it('POST /auth/login issues a token whose lifetime is one hour', async () => {
+    const passwordHash = await bcrypt.hash(validPayload.password, 10);
+    prisma.user.findUnique.mockResolvedValue({
+      id: 'user-1',
+      name: validPayload.name,
+      email: validPayload.email,
+      passwordHash,
+      createdAt,
+    });
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email: validPayload.email, password: validPayload.password })
+      .expect(200);
+
+    const decoded = jwtService.decode(response.body.accessToken as string) as {
+      iat: number;
+      exp: number;
+    };
+
+    expect(decoded.exp - decoded.iat).toBe(3600);
+  });
+
   it('POST /auth/login rejects an unknown e-mail with a generic message', async () => {
     prisma.user.findUnique.mockResolvedValue(null);
 

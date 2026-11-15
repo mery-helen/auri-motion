@@ -76,7 +76,7 @@
     - `apps/web/src/app/core/guards/guest.guard.spec.ts`
     - `apps/web/src/app/core/interceptors/jwt.interceptor.spec.ts`
 
-- [ ] **Tarefa 7 — Corrigir `expiresIn` do JWT (sessão de 1h de verdade)**
+- [x] **Tarefa 7 — Corrigir `expiresIn` do JWT (sessão de 1h de verdade)**
   - Cobre: CA2 (sessão de 1h) — pendência 1 da auditoria final
   - Teste primeiro: teste que decodifica o token emitido por `AuthService.login()` e confere `exp − iat = 3600` (com `JwtService` real, não mockado); falha enquanto `JWT_EXPIRES_IN` for lido como string sem conversão de unidade.
   - Arquivos previstos:
