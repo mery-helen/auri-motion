@@ -85,7 +85,7 @@
     - `apps/api/.env.example` (`JWT_EXPIRES_IN=3600` com comentário/documentação da unidade: segundos)
     - `apps/api/src/modules/auth/auth.service.spec.ts` e/ou `apps/api/src/modules/auth/auth.controller.spec.ts` (onde couber o teste de `exp − iat`)
 
-- [ ] **Tarefa 8 — Alinhar `docs/architecture.md` ao código real**
+- [x] **Tarefa 8 — Alinhar `docs/architecture.md` ao código real**
   - Cobre: pendência 2 da auditoria final (documentação) — não é critério de aceite
   - Teste primeiro: sem testes — tarefa de documentação; a verificação é a leitura do auditor final.
   - Arquivos previstos:

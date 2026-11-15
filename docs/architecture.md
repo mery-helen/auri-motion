@@ -1,7 +1,7 @@
 # 🛠️ Architecture / Software Design Document
 
 **Projeto:** Auri Motion  
-**Versão:** 1.6.0 · US01 implementada  
+**Versão:** 1.7.0 · US01 implementada  
 **Última atualização:** 2026-11-15  
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
@@ -51,17 +51,19 @@
 | **Driver PostgreSQL (Prisma)** | `@prisma/adapter-pg`, `pg`, `dotenv` | 7.10+ / 8.23+ / 17.4+ | [prisma.io/docs](https://www.prisma.io/docs) · [npmjs](https://www.npmjs.com/package/@prisma/adapter-pg) | O Prisma 7 não traz o motor de conexão embutido e a CLI não lê o `.env` sozinha |
 | **Testes (Web)** | Vitest (`vitest`) | 5.x | [angular.dev/guide/testing](https://angular.dev/guide/testing) · [vitest.dev](https://vitest.dev/) | Suíte de testes unitários padrão e recomendada pelo Angular CLI (substitui o Karma descontinuado) |
 | **Lint (Web)** | `angular-eslint` | 22+ | [angular-eslint/github](https://github.com/angular-eslint/angular-eslint) · [angular.dev/style-guide](https://angular.dev/style-guide) | Ferramenta oficial do ecossistema Angular executada pelo comando `ng lint` para análise estática de TypeScript e templates |
-| **Gateway de pagamento** | Mercado Pago SDK (`mercadopago`) | 3+ | [mercadopago.com.br/pix](https://www.mercadopago.com.br/developers/pt/docs/checkout-api/integration-configuration/integrate-with-pix) · [npmjs](https://www.npmjs.com/package/mercadopago) | Emissão de pagamentos Pix via Checkout Transparente (Payments API no servidor com QR Code base64, Pix Copia e Cola, link e expiração em 5 minutos) e recepção de webhooks |
-| **Job scheduler** | `@nestjs/schedule` | 12+ | [docs.nestjs.com/task-scheduling](https://docs.nestjs.com/techniques/task-scheduling) · [npmjs](https://www.npmjs.com/package/@nestjs/schedule) | Cron jobs no NestJS para expiração automática de cobranças (`@Cron`) |
-| **Documentação API** | `@nestjs/swagger` | 12+ | [docs.nestjs.com/openapi](https://docs.nestjs.com/openapi/introduction) · [npmjs](https://www.npmjs.com/package/@nestjs/swagger) | Gera e serve o contrato OpenAPI/Swagger interativo a partir do código em `/docs` |
-| **Config e variáveis** | `@nestjs/config` | 12+ | [docs.nestjs.com/configuration](https://docs.nestjs.com/techniques/configuration) · [npmjs](https://www.npmjs.com/package/@nestjs/config) | Carrega e valida variáveis de ambiente via `ConfigModule` |
-| **Validação de env** | Joi (`joi`) | 18+ | [joi.dev/api](https://joi.dev/api/) · [npmjs](https://www.npmjs.com/package/joi) | Schema de validação das variáveis de ambiente na inicialização do `ConfigModule` |
+| **Gateway de pagamento** | Mercado Pago SDK (`mercadopago`) | 3+ — ainda não instalado | [mercadopago.com.br/pix](https://www.mercadopago.com.br/developers/pt/docs/checkout-api/integration-configuration/integrate-with-pix) · [npmjs](https://www.npmjs.com/package/mercadopago) | **Ainda não instalado/implementado** (previsto para US04/US05): emissão de pagamentos Pix via Checkout Transparente (Payments API no servidor com QR Code base64, Pix Copia e Cola, link e expiração em 5 minutos) e recepção de webhooks |
+| **Job scheduler** | `@nestjs/schedule` | 12+ — ainda não instalado | [docs.nestjs.com/task-scheduling](https://docs.nestjs.com/techniques/task-scheduling) · [npmjs](https://www.npmjs.com/package/@nestjs/schedule) | **Ainda não instalado/implementado** (ID/§2.4): Cron jobs no NestJS para expiração automática de cobranças (`@Cron`) |
+| **Documentação API** | `@nestjs/swagger` | 12+ — ainda não instalado | [docs.nestjs.com/openapi](https://docs.nestjs.com/openapi/introduction) · [npmjs](https://www.npmjs.com/package/@nestjs/swagger) | **Ainda não instalado/implementado** (ID14): geraria e serviria o contrato OpenAPI/Swagger interativo a partir do código em `/docs` |
+| **Config e variáveis** | `@nestjs/config` | 12+ | [docs.nestjs.com/configuration](https://docs.nestjs.com/techniques/configuration) · [npmjs](https://www.npmjs.com/package/@nestjs/config) | Carrega variáveis de ambiente via `ConfigModule` — **parcial**: carrega, mas não valida (`app.module.ts` usa `ConfigModule.forRoot({ isGlobal: true })` sem `validationSchema`; ver ID17) |
+| **Validação de env** | Joi (`joi`) | 18+ — ainda não instalado | [joi.dev/api](https://joi.dev/api/) · [npmjs](https://www.npmjs.com/package/joi) | **Ainda não instalado/implementado** (ID17): schema de validação das variáveis de ambiente na inicialização do `ConfigModule` |
 | **Validação de entrada** | `class-validator` | 0.15+ | [github.com/class-validator](https://github.com/typestack/class-validator) · [npmjs](https://www.npmjs.com/package/class-validator) | Decoradores de validação nos DTOs (`@IsEmail`, `@IsNotEmpty`, …) |
 | **Transformação de entrada** | `class-transformer` | 0.5+ | [github.com/class-transformer](https://github.com/typestack/class-transformer) · [npmjs](https://www.npmjs.com/package/class-transformer) | Converte objetos plain em instâncias de classe para o `ValidationPipe` |
 | **Autenticação JWT** | `@nestjs/jwt` | 12+ | [docs.nestjs.com/security/jwt](https://docs.nestjs.com/security/authentication#jwt-functionality) · [npmjs](https://www.npmjs.com/package/@nestjs/jwt) | Emissão, assinatura e verificação criptográfica de tokens JWT |
 | **Estratégia Passport** | `@nestjs/passport` | 12+ | [docs.nestjs.com/security/auth](https://docs.nestjs.com/security/authentication) · [npmjs](https://www.npmjs.com/package/@nestjs/passport) | Integração do Passport.js ao ciclo de vida e injeção do NestJS |
 | **Estratégia JWT** | `passport-jwt` | 4+ | [passportjs.org/passport-jwt](http://www.passportjs.org/packages/passport-jwt/) · [npmjs](https://www.npmjs.com/package/passport-jwt) | Extrai e valida o token JWT do cabeçalho HTTP `Authorization: Bearer` |
 | **Hash de senha** | `bcrypt` | 6+ | [github.com/node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js) · [npmjs](https://www.npmjs.com/package/bcrypt) | Hash seguro de senhas com salt rounds antes de persistir no banco |
+
+> ⚠️ **Linhas marcadas "ainda não instalado"** (Mercado Pago SDK, `@nestjs/schedule`, `@nestjs/swagger`, Joi): as dependências não estão em `apps/api/package.json` e não há código que as use. As linhas e os IDs correspondentes são mantidos de propósito — declaram o padrão pretendido, não o estado do repositório.
 
 ### 🧩 2.1. Padrões de código — Angular 22
 
@@ -83,21 +85,25 @@ Declaradas aqui para uso como critério fixo pelos revisores (IDs 6–10, 14, 17
 | **ID7** | Todo endpoint recebe e valida entrada via **DTO** decorado com `class-validator`. `ValidationPipe` global com `whitelist: true` e `forbidNonWhitelisted: true` — campos não declarados no DTO são bloqueados. |
 | **ID8** | Operações relacionais executadas exclusivamente via **Prisma ORM** (`PrismaService` injetado nos services). Queries SQL brutas proibidas em código de produção. |
 | **ID9** | Autenticação via **JWT** (`@nestjs/jwt` + `@nestjs/passport` + `passport-jwt`). Rotas protegidas com `JwtAuthGuard` e injeção do usuário logado via `@CurrentUser()`. Payload do token contém apenas `sub` (userId). Como o sistema opera com perfil único (fisioterapeuta autônomo), o controle de acesso e o isolamento dos dados são garantidos pelo filtro de `userId` em todas as consultas. |
-| **ID10** | **Interceptor global** de resposta: envelope `{ data, meta }` para sucesso. **Exception Filter global** para erros: envelope `{ error: { code, message } }` — nenhum stack trace vaza em produção. |
-| **ID14** | Swagger gerado do código via `@nestjs/swagger`, servido em `/docs`. O arquivo `swagger.json` **não é commitado** — a fonte é o endpoint vivo. Frontend deriva contratos do Swagger. |
-| **ID17** | Credenciais e variáveis sensíveis (`DATABASE_URL`, `JWT_SECRET`, `MP_ACCESS_TOKEN`, etc.) **jamais aparecem no repositório**. Carregadas via `ConfigModule` com `validationSchema` (Joi) e injetadas como variáveis de ambiente na plataforma de hospedagem. |
-| **ID18** | Pipeline de CI via **GitHub Actions**: roda Vitest + oxlint na API e Vitest + ng lint na Web no push e no PR antes do merge na `main`. Merge bloqueado se a suite falhar. |
-| **ID19** | API hospedada no **Render** (container Docker). Frontend Angular hospedado na **Vercel**. Banco PostgreSQL em produção: **Neon.tech** com Connection Pooling do Prisma (`?pgbouncer=true` na `DATABASE_URL` de produção). |
-| **ID20** | Fluxo de pagamento via **Mercado Pago SDK** em sandbox: emissão de Pix via Checkout Transparente (Payments API: `payment.create` com `payment_method_id: 'pix'`) criada exclusivamente no servidor (nunca no frontend), com `date_of_expiration` de 5 minutos. O gateway retorna QR Code dinâmico (`qr_code_base64`), Pix Copia e Cola (`qr_code`), link (`ticket_url`) e o identificador `mpPaymentId`. A cobrança é persistida em `Billing` com status `PENDING`, `expiresAt` (5 minutos) e `mpPaymentId`. |
-| **ID21** | Webhook de confirmação recebido no endpoint `POST /webhooks/mercadopago` (notificação de pagamento com `data.id` correspondente ao `mpPaymentId`). **Validação de assinatura** via header `x-signature` antes de qualquer alteração de estado. Consulta ao status da transação via SDK (`approved`), criação do registro em `Payment` e atualização da cobrança para `PAID`. Processamento idempotente: cobrança já `PAID` é ignorada silenciosamente (RN07 + RN08). |
+| **ID10** | **Interceptor global** de resposta: envelope `{ data, meta }` para sucesso. **Exception Filter global** para erros: envelope `{ error: { code, message } }` — nenhum stack trace vaza em produção. **Ainda não implementado**: não existe `ResponseInterceptor` nem `GlobalExceptionFilter` em `apps/api/src/common/` (o diretório contém apenas `decorators/` e `guards/`); `main.ts` registra somente o `ValidationPipe` global, e erros seguem o filtro padrão do NestJS |
+| **ID14** | Swagger gerado do código via `@nestjs/swagger`, servido em `/docs`. O arquivo `swagger.json` **não é commitado** — a fonte é o endpoint vivo. Frontend deriva contratos do Swagger. **Ainda não implementado**: `@nestjs/swagger` não está instalado e não há setup no `main.ts`; `/docs` não existe |
+| **ID17** | Credenciais e variáveis sensíveis (`DATABASE_URL`, `JWT_SECRET`, `MP_ACCESS_TOKEN`, etc.) **jamais aparecem no repositório**. Carregadas via `ConfigModule` com `validationSchema` (Joi) e injetadas como variáveis de ambiente na plataforma de hospedagem. **Parcial — ainda não implementado o `validationSchema` (Joi)**: `app.module.ts` usa `ConfigModule.forRoot({ isGlobal: true })` sem `validationSchema`, e `joi` não está instalado. A parte "jamais no repositório" vale: `.env` está no `.gitignore` |
+| **ID18** | Pipeline de CI via **GitHub Actions**: roda Vitest + oxlint na API e Vitest + ng lint na Web no push e no PR antes do merge na `main`. Merge bloqueado se a suite falhar. **Ainda não implementado**: `.github/workflows/` contém apenas `portao-de-entendimento.yml` e `site.yml` — nenhum workflow roda testes ou lint |
+| **ID19** | API hospedada no **Render** (container Docker). Frontend Angular hospedado na **Vercel**. Banco PostgreSQL em produção: **Neon.tech** com Connection Pooling do Prisma (`?pgbouncer=true` na `DATABASE_URL` de produção). **Não verificável pelo repositório**: não há Dockerfile, `render.yaml` ou `vercel.json` — é padrão declarado para produção, não estado verificado |
+| **ID20** | Fluxo de pagamento via **Mercado Pago SDK** em sandbox: emissão de Pix via Checkout Transparente (Payments API: `payment.create` com `payment_method_id: 'pix'`) criada exclusivamente no servidor (nunca no frontend), com `date_of_expiration` de 5 minutos. O gateway retorna QR Code dinâmico (`qr_code_base64`), Pix Copia e Cola (`qr_code`), link (`ticket_url`) e o identificador `mpPaymentId`. A cobrança é persistida em `Billing` com status `PENDING`, `expiresAt` (5 minutos) e `mpPaymentId`. **Ainda não implementado**: `mercadopago` não está instalado e não existe `modules/billing/` — US04 pendente |
+| **ID21** | Webhook de confirmação recebido no endpoint `POST /webhooks/mercadopago` (notificação de pagamento com `data.id` correspondente ao `mpPaymentId`). **Validação de assinatura** via header `x-signature` antes de qualquer alteração de estado. Consulta ao status da transação via SDK (`approved`), criação do registro em `Payment` e atualização da cobrança para `PAID`. Processamento idempotente: cobrança já `PAID` é ignorada silenciosamente (RN07 + RN08). **Ainda não implementado**: `mercadopago` não está instalado e não existe `modules/payments/` — US05 pendente |
 
-### 🌐 2.3. O contrato da API
+### 🌐 2.3. O contrato da API (ainda não implementado)
 
-Swagger gerado do código, servido em `/docs`. O frontend deriva os contratos do Swagger — não existem tabelas de endpoints manuais neste documento. O arquivo gerado (`swagger.json`) **não é commitado**.
+> **Ainda não implementado.** `@nestjs/swagger` não está instalado em `apps/api/package.json`, não há setup de Swagger em `apps/api/src/main.ts` e a rota `/docs` não existe. Nenhum contrato de endpoint é servido hoje.
 
-### ⏰ 2.4. Expiração de cobranças
+Padrão declarado (ID14): Swagger gerado do código, servido em `/docs`. O frontend derivará os contratos do Swagger — não existem tabelas de endpoints manuais neste documento. O arquivo gerado (`swagger.json`) **não será commitado** quando a implementação existir.
 
-Job agendado com `@nestjs/schedule` (`@Cron` a cada 1 minuto) que consulta cobranças com status `PENDING` onde `expiresAt < now()`, atualizando-as para `EXPIRED`. O tempo de expiração (`expiresAt`) é fixado em 5 minutos a partir da emissão e sincronizado com o gateway via `date_of_expiration`. A operação é idempotente: cobranças com status `PAID` são ignoradas (RN06). Resolve a dúvida aberta registrada em `docs/user-flows.md`.
+### ⏰ 2.4. Expiração de cobranças (ainda não implementado)
+
+> **Ainda não implementado.** `@nestjs/schedule` não está instalado, não existe o módulo de agendamento e nenhuma cobrança existe (US04/US05 pendentes).
+
+Padrão declarado: Job agendado com `@nestjs/schedule` (`@Cron` a cada 1 minuto) que consulta cobranças com status `PENDING` onde `expiresAt < now()`, atualizando-as para `EXPIRED`. O tempo de expiração (`expiresAt`) é fixado em 5 minutos a partir da emissão e sincronizado com o gateway via `date_of_expiration`. A operação é idempotente: cobranças com status `PAID` são ignoradas (RN06). Resolve a dúvida aberta registrada em `docs/user-flows.md`.
 
 ---
 
@@ -111,7 +117,7 @@ Job agendado com `@nestjs/schedule` (`@Cron` a cada 1 minuto) que consulta cobra
 .
 ├── .agents/                    # constituição, workflows e prompts dos agentes (§1)
 ├── .claude/ .cursor/ .opencode/ # cascas de cada ferramenta — só apontam para .agents/
-├── .github/                    # template de PR e o Portão de Entendimento
+├── .github/                    # template de PR, o Portão de Entendimento e o Site do método — nenhum workflow roda testes/lint (ID18)
 ├── .gitattributes              # normalização universal de quebra de linha (LF)
 ├── .gitignore                  # único, na raiz (cobre node_modules, build, .env e generated)
 ├── package.json                # orquestrador: workspaces ("apps/*") e scripts com -w
@@ -122,13 +128,13 @@ Job agendado com `@nestjs/schedule` (`@Cron` a cada 1 minuto) que consulta cobra
 ├── docs/                       # prd.md, user-flows.md, design-tokens.md, este arquivo, checklist.md e guias
 ├── specs/                      # uma pasta por história implementada (índice README.md)
 └── apps/
-    ├── api/                    # NestJS 12 — backend, Prisma, JWT, Swagger, webhooks
+    ├── api/                    # NestJS 12 — backend, Prisma, JWT (Swagger e webhooks ainda não implementados)
     │   ├── .env                # fora do Git (credenciais locais)
     │   ├── .env.example        # modelo de variáveis de ambiente
     │   ├── .oxlintrc.json      # linter type-aware da API
     │   ├── .prettierrc         # formatação de código
     │   ├── prisma.config.ts    # configuração do Prisma 7 (adapter-pg e dotenv)
-    │   ├── prisma/             # schema.prisma inicial (sem models de negócio)
+    │   ├── prisma/             # schema.prisma com o model `User` (US01)
     │   ├── src/                # arquitetura em módulos (§5)
     │   └── package.json        # dependências e scripts da API
     └── web/                    # Angular 22 — frontend, Tailwind CSS 4, SPA
@@ -148,13 +154,13 @@ Organização interna por **feature/domínio**:
 ```text
 apps/web/src/
 ├── app/
-│   ├── core/                  # Serviços singleton globais (AuthService, HttpInterceptor JWT)
-│   ├── shared/                # Componentes e pipes reutilizáveis sem domínio
+│   ├── core/                  # Guards (AuthGuard, GuestGuard em guards/), JwtInterceptor (interceptors/) e TokenStore (session/token.store.ts)
+│   ├── shared/                # Componentes e pipes reutilizáveis sem domínio — ainda não existe
 │   └── features/
-│       ├── auth/              # US01 — login e cadastro
-│       ├── patients/          # US02 — carteira de pacientes
-│       ├── appointments/      # US03 — agendamento e registro de atendimento
-│       └── billing/           # US04 + US05 — cobranças e status de pagamento
+│       ├── auth/              # US01 — login e cadastro (AuthService mora aqui, em features/auth/auth.service.ts — não no core/)
+│       ├── patients/          # US02 — ainda não implementado (apenas o stub patients-stub, com // TODO #2)
+│       ├── appointments/      # US03 — ainda não implementado
+│       └── billing/           # US04 + US05 — ainda não implementado
 └── styles.css                 # entrada do Tailwind CSS 4 (@import "tailwindcss" + @theme)
 ```
 
@@ -165,7 +171,7 @@ apps/web/src/
 
 ### 🧩 4.1. Cruzamento de domínios na UI: Tela Detalhe da Sessão
 
-- A tela **Detalhe da Sessão** mora em `features/appointments`.
+- A tela **Detalhe da Sessão** mora em `features/appointments` (a criar em US03 — a feature ainda não existe).
 - Lê a cobrança pela resposta agregada do atendimento.
 - Ações que mudam de contexto navegam por rota para `billing`.
 - Componentes visuais sem domínio ficam em `shared`.
@@ -174,31 +180,31 @@ apps/web/src/
 
 ## 🏗️ 5. Arquitetura Backend (`apps/api`)
 
-Organização interna por **módulo de domínio** (espelha as features do frontend):
+> Organização interna por **módulo de domínio** (espelha as features do frontend). Apenas `modules/auth/` existe hoje — os demais módulos nascem com suas histórias (US02–US05) e estão indicados como ainda não implementados.
 
 ```text
 apps/api/src/
-├── main.ts                    # bootstrap: ValidationPipe global, Swagger, Exception Filter global
-├── app.module.ts
+├── main.ts                    # bootstrap: ValidationPipe global (Swagger e Exception Filter global ainda não implementados)
+├── app.module.ts              # ConfigModule.forRoot({ isGlobal: true }) — sem validationSchema (Joi)
 ├── prisma/                    # PrismaService (singleton)
-├── config/                    # ConfigModule com validação de variáveis de ambiente (Joi)
+├── config/                    # ainda não existe — a validação de env (Joi) não foi implementada; ConfigModule vive no app.module.ts
 ├── common/
 │   ├── decorators/            # @CurrentUser()
 │   ├── guards/                # JwtAuthGuard
-│   ├── filters/               # GlobalExceptionFilter
-│   ├── interceptors/          # ResponseInterceptor (envelope de sucesso)
-│   └── pipes/                 # ValidationPipe (configurado no main.ts)
+│   ├── filters/               # ainda não existe — GlobalExceptionFilter (ID10)
+│   ├── interceptors/          # ainda não existe — ResponseInterceptor (ID10)
+│   └── pipes/                 # ainda não existe — o ValidationPipe é registrado no main.ts, não em common/pipes/
 └── modules/
-    ├── auth/                  # US01 — registro, login, JWT
-    ├── patients/              # US02 — CRUD de pacientes + comorbidades
-    ├── appointments/          # US03 — agendamentos + condutas
-    ├── billing/               # US04 — emissão de cobranças
-    ├── payments/              # US05 — webhook Mercado Pago, idempotência
-    └── scheduler/             # job de expiração de cobranças (@nestjs/schedule)
+    ├── auth/                  # US01 — registro, login, JWT (implementado)
+    ├── patients/              # US02 — ainda não implementado
+    ├── appointments/          # US03 — ainda não implementado
+    ├── billing/               # US04 — ainda não implementado
+    ├── payments/              # US05 — ainda não implementado
+    └── scheduler/             # job de expiração de cobranças — ainda não implementado (§2.4)
 ```
 
 **Comunicação entre domínios no Backend:**
-O `AppointmentsService` lê a cobrança por consulta de leitura via Prisma (`include`), sem importar o `BillingModule`, para evitar dependência circular.
+O `AppointmentsService` lê a cobrança por consulta de leitura via Prisma (`include`), sem importar o `BillingModule`, para evitar dependência circular. **Padrão declarado — ainda não implementado**: `AppointmentsService`, `modules/appointments/` e `modules/billing/` não existem (US03 e US04 pendentes).
 
 ---
 
@@ -302,7 +308,7 @@ erDiagram
 | Ambiente | Onde roda | Como conecta |
 | :--- | :--- | :--- |
 | **Local** | PostgreSQL 16 via Docker (`docker compose up`) | `DATABASE_URL` em `.env` local (não commitado) |
-| **CI** | PostgreSQL 16 via service container do GitHub Actions | `DATABASE_URL` definida pelo próprio workflow (container descartável) — não é secret |
+| **CI** | **Ainda não implementado** | Nenhum workflow de CI existe em `.github/workflows/` — há apenas `portao-de-entendimento.yml` (checa o corpo do PR) e `site.yml` (publica o site do método; nem roda neste repositório). O padrão declarado (ID18) seria PostgreSQL 16 via service container do GitHub Actions com `DATABASE_URL` definida pelo próprio workflow (container descartável), não é secret — mas nada disso existe hoje |
 | **Produção** | Neon.tech (PostgreSQL gerenciado) | `DATABASE_URL` com `?pgbouncer=true` injetada via variável de ambiente do Render |
 
 > 🔒 Credenciais **nunca** aparecem no repositório — nem em código, nem em
@@ -346,15 +352,20 @@ npm run lint
 ### Web (`apps/web`)
 
 ```bash
-# Suíte de testes
-npx vitest run
+# Suíte de testes — script local "test" → ng test
+npm test
 
-# Watch mode (desenvolvimento)
-npx vitest
+# Execução única, sem watch (verificado em 2026-11-15: 6 arquivos de teste, 26 testes passam)
+ng test --no-watch
+
+# O mesmo, a partir da raiz do monorepo (verificado em 2026-11-15: 6 arquivos, 26 testes passam)
+npm test -w apps/web -- --no-watch
 
 # Lint
 ng lint
 ```
+
+> `npx vitest run` standalone **não funciona** nesta configuração: os specs usam os globais do runner que o builder `@angular/build:unit-test` injeta, e a execução direta falha com `describe is not defined` (6 suítes, 0 testes). O Vitest roda via `ng test`, não diretamente.
 
 ### Comandos da raiz do monorepo (npm workspaces)
 
@@ -391,6 +402,7 @@ docker compose up -d
 | 2026-10-17 | 1.4.0 | Revisão da Entrega 1: status CANCELED em Appointment (RN10), CPF único por fisioterapeuta (RN12), tabela de status PRD × código e regras de negócio que aparecem no ER |
 | 2026-11-11 | 1.5.0 | Ratificação pós-setup: ESM, Vitest e oxlint do gerador oficial do NestJS 12; @nestjs/mau vindo do gerador; npm workspaces com package-lock.json único e scripts -w apps/x; Prisma fixado na linha 7; @prisma/adapter-pg, pg e dotenv declarados; .gitignore único na raiz cobrindo apps/api/generated/; PostgreSQL em Docker sem nenhuma tabela |
 | 2026-11-15 | 1.6.0 | US01 implementada: linha no Mapa de Domínios (§7) preenchida para autenticação; diagramas sem alteração estrutural — `core/` do web agora inclui guards, `JwtInterceptor` e `TokenStore` conforme §4 |
+| 2026-11-15 | 1.7.0 | Alinhamento ao código real (pendência 2 da auditoria final): §2 — dependências `mercadopago`, `@nestjs/schedule`, `@nestjs/swagger` e `joi` marcadas como ainda não instaladas (linhas mantidas, nenhum ID removido); `@nestjs/config` descrita como parcial (sem `validationSchema`); §2.2 — ID10 (Exception Filter global e ResponseInterceptor inexistentes em `common/`), ID14 (Swagger em `/docs` inexistente), ID17 (`ConfigModule.forRoot({ isGlobal: true })` sem `validationSchema`; exceção: `.env` no `.gitignore`) e ID18 (nenhum workflow roda testes/lint; `.github/workflows/` só tem `portao-de-entendimento.yml` e `site.yml`) rotulados como não implementados; §2.3 mantida como seção rotulada não implementada; §2.4 rotulada não implementada; §3 — `prisma/` citado com o model `User` (não "sem models de negócio"); §4 — `AuthService` removido do `core/` (mora em `features/auth/auth.service.ts`); `core/` listado como guards + `JwtInterceptor` + `TokenStore`; `shared/` e features `patients` (stub, `// TODO #2`), `appointments` e `billing` rotuladas não implementadas; §5 — `main.ts` descrito como só ValidationPipe global; `app.module.ts` sem `validationSchema`; `config/`, `common/filters/`, `common/interceptors/` e `common/pipes/` marcados como inexistentes; `modules/` além de `auth/` marcados não implementados; a nota "Comunicação entre domínios no Backend" rotulada como padrão declarado não implementado (`AppointmentsService` não existe); §2.2 — ID19 rotulado como não verificável pelo repositório (sem Dockerfile, `render.yaml` ou `vercel.json`) e ID20/ID21 rotulados não implementados (`mercadopago` não instalado; `billing/` e `payments/` inexistentes); §6.3 — linha CI rotulada não implementada; §8 — comando de testes da Web corrigido para `ng test --no-watch` (verificado: 6 arquivos, 26 testes; `npx vitest run` standalone falha com `describe is not defined`). Dívida conhecida ao fim de US01: ID10, ID14, ID17 (validationSchema), ID18, ID20 e ID21 inexistentes; ID19 apenas declarado; `shared/` e os módulos/features de US02–US05 nascem com suas histórias; Swagger, Exception Filter e CI seguem no papel até US04/US05+ |
 
 ---
 
