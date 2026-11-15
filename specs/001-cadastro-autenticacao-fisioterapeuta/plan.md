@@ -54,7 +54,7 @@
     - `apps/web/src/app/features/auth/auth.service.ts` (repositório HTTP)
     - `apps/web/src/app/features/auth/register/register.component.spec.ts`
 
-- [ ] **Tarefa 5 — Tela de login + gerenciamento de sessão no frontend**
+- [x] **Tarefa 5 — Tela de login + gerenciamento de sessão no frontend**
   - Cobre: CA2 (login válido abre sessão de 1h e redireciona para `/patients`), CA3 (credenciais inválidas exibem "Credenciais inválidas")
   - Teste primeiro: testes do `LoginComponent` — (a) submit com credenciais válidas chama `AuthService.login()`, armazena o token e navega para `/patients`; (b) quando o service retorna erro de credenciais, a mensagem genérica é exibida sem especificar o campo. Falham enquanto o componente não existir.
   - Arquivos previstos:

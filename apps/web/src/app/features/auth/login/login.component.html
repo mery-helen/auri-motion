@@ -1,0 +1,82 @@
+<main class="min-h-screen bg-[#F8FAFC] flex flex-col justify-center items-center px-4 py-8">
+  <div class="w-full max-w-md bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8">
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-bold text-[#0F2922]">Entrar</h1>
+      <p class="text-sm text-[#52605C] mt-1">Acesse para gerenciar seus atendimentos</p>
+    </div>
+
+    @if (formError()) {
+      <div
+        data-testid="form-error"
+        role="alert"
+        class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-[#DC2626]"
+      >
+        {{ formError() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
+      <div>
+        <label for="email" class="block text-sm font-medium text-[#0F2922] mb-1">
+          E-mail
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="seu@email.com"
+          autocomplete="email"
+          class="w-full px-3 py-2 border rounded-lg text-sm text-[#0F2922] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1F4B3E]"
+          [class.border-red-500]="emailError"
+          [class.border-slate-300]="!emailError"
+        />
+        @if (emailError) {
+          <span data-testid="email-error" class="block text-xs text-[#DC2626] mt-1">
+            {{ emailError }}
+          </span>
+        }
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-[#0F2922] mb-1">
+          Senha
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Sua senha"
+          autocomplete="current-password"
+          class="w-full px-3 py-2 border rounded-lg text-sm text-[#0F2922] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1F4B3E]"
+          [class.border-red-500]="passwordError"
+          [class.border-slate-300]="!passwordError"
+        />
+        @if (passwordError) {
+          <span data-testid="password-error" class="block text-xs text-[#DC2626] mt-1">
+            {{ passwordError }}
+          </span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        data-testid="submit-button"
+        [disabled]="isSubmitting()"
+        class="w-full py-2.5 px-4 rounded-lg font-medium text-sm text-white bg-[#2E9C7C] hover:bg-[#247D63] focus:outline-none focus:ring-2 focus:ring-[#1F4B3E] focus:ring-offset-2 disabled:bg-[#E2E8F0] disabled:text-[#94A3B8] disabled:cursor-not-allowed transition-colors"
+      >
+        @if (isSubmitting()) {
+          <span>Entrando...</span>
+        } @else {
+          <span>Entrar</span>
+        }
+      </button>
+    </form>
+
+    <div class="mt-6 text-center text-sm text-[#52605C]">
+      Ainda não tem uma conta?
+      <a routerLink="/register" class="text-[#2E9C7C] font-medium hover:underline">
+        Criar conta
+      </a>
+    </div>
+  </div>
+</main>
