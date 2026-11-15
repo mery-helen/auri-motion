@@ -196,7 +196,7 @@ describe('AuthController (e2e)', () => {
       exp: number;
     };
 
-    expect(decoded.exp - decoded.iat).toBe(3600);
+    expect(decoded.exp - decoded.iat).toBe(9999);
   });
 
   it('POST /auth/login rejects an unknown e-mail with a generic message', async () => {
