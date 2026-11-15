@@ -1,8 +1,8 @@
 # 🛠️ Architecture / Software Design Document
 
 **Projeto:** Auri Motion  
-**Versão:** 1.5.0 · ratificação do setup  
-**Última atualização:** 2026-11-11  
+**Versão:** 1.6.0 · US01 implementada  
+**Última atualização:** 2026-11-15  
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -319,7 +319,7 @@ erDiagram
 
 | Domínio | Módulo (pasta) | Guard | Dados (repository) | US |
 | :------ | :------------- | :---- | :----------------- | :-- |
-| | | | | |
+| Autenticação | `apps/api/src/modules/auth/` · `apps/web/src/app/features/auth/` e `apps/web/src/app/core/` (guards, `JwtInterceptor`, `TokenStore`) | `JwtAuthGuard` (API) · `AuthGuard` / `GuestGuard` (web) | `PrismaService` (model `User`) | US01 |
 
 ---
 
@@ -390,6 +390,7 @@ docker compose up -d
 | 2026-10-12 | 1.3.0 | §4.1 reduzido ao princípio; leitura de billing via Prisma include no backend; remoção completa de role (User, JWT, guards, ID9); Pix via Checkout Transparente (QR Code, copia-e-cola, ticket_url, mpPaymentId); testes da API retornados ao Jest com dependências declaradas (@nestjs/testing, ts-jest, supertest) e ID18/§8 ajustados; Appointment.status mantido |
 | 2026-10-17 | 1.4.0 | Revisão da Entrega 1: status CANCELED em Appointment (RN10), CPF único por fisioterapeuta (RN12), tabela de status PRD × código e regras de negócio que aparecem no ER |
 | 2026-11-11 | 1.5.0 | Ratificação pós-setup: ESM, Vitest e oxlint do gerador oficial do NestJS 12; @nestjs/mau vindo do gerador; npm workspaces com package-lock.json único e scripts -w apps/x; Prisma fixado na linha 7; @prisma/adapter-pg, pg e dotenv declarados; .gitignore único na raiz cobrindo apps/api/generated/; PostgreSQL em Docker sem nenhuma tabela |
+| 2026-11-15 | 1.6.0 | US01 implementada: linha no Mapa de Domínios (§7) preenchida para autenticação; diagramas sem alteração estrutural — `core/` do web agora inclui guards, `JwtInterceptor` e `TokenStore` conforme §4 |
 
 ---
 
