@@ -44,7 +44,7 @@
 
 ## 📝 4. Escopo Funcional (User Stories)
 
-### US01 — Cadastro e Autenticação do Fisioterapeuta · `Must Have` · `S` · Status: `🟡 Ready`
+### US01 — Cadastro e Autenticação do Fisioterapeuta · `Must Have` · `S` · Status: `🟢 Live`
 
 **Como** fisioterapeuta ou estudante de fisioterapia,  
 **eu quero** criar minha conta e me autenticar com e-mail e senha,  
