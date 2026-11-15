@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { TokenStore } from '../../core/session/token.store';
 
 export interface RegisterPayload {
   name: string;
@@ -25,13 +26,12 @@ export interface LoginResponse {
   expiresIn: number;
 }
 
-const TOKEN_STORAGE_KEY = 'auri-motion.access-token';
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly tokenStore = inject(TokenStore);
   private readonly baseUrl = '/auth';
 
   register(payload: RegisterPayload): Observable<RegisteredUser> {
@@ -43,14 +43,14 @@ export class AuthService {
   }
 
   saveToken(token: string): void {
-    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    this.tokenStore.saveToken(token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_STORAGE_KEY);
+    return this.tokenStore.getToken();
   }
 
   clearToken(): void {
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    this.tokenStore.clearToken();
   }
 }

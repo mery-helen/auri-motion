@@ -64,7 +64,7 @@
     - `apps/web/src/app/features/auth/login/login.component.spec.ts`
     - `apps/web/src/app/features/patients/patients-stub/patients-stub.component.ts` (`// TODO #2`)
 
-- [ ] **Tarefa 6 — Guards de rota e interceptor JWT no frontend**
+- [x] **Tarefa 6 — Guards de rota e interceptor JWT no frontend**
   - Cobre: CA7 (sessão expirada → redirecionado para login), CA8 (já autenticado em /login ou /cadastro → redirecionado para /patients), CA9 (sem sessão em rota protegida → redirecionado para login)
   - Teste primeiro: testes unitários do `AuthGuard`, `GuestGuard` e `JwtInterceptor` — (a) `AuthGuard` bloqueia rota sem token e redireciona para `/login`; (b) `GuestGuard` bloqueia `/login` com token válido e redireciona para `/patients`; (c) `JwtInterceptor` ao receber resposta 401 limpa o token e redireciona para `/login`. Todos falham enquanto as classes não existirem.
   - Arquivos previstos:
