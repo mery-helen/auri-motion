@@ -45,7 +45,7 @@
     - `apps/api/src/modules/auth/auth.service.spec.ts` (complemento)
     - `apps/api/src/modules/auth/auth.controller.spec.ts` (complemento e2e)
 
-- [ ] **Tarefa 4 — Tela de cadastro no frontend**
+- [x] **Tarefa 4 — Tela de cadastro no frontend**
   - Cobre: CA1 (formulário envia e redireciona para login), CA6 (mensagens de validação por campo), CA10 (erro de rede: mensagem exibida, campos mantidos)
   - Teste primeiro: testes do `RegisterComponent` — (a) submit com dados válidos chama `AuthService.register()` e, em sucesso, navega para `/login`; (b) submit com senha fraca exibe mensagem de validação no campo; (c) quando `AuthService.register()` rejeita com erro de rede, a mensagem de conectividade aparece e os campos permanecem preenchidos. Falham enquanto o componente e o service de repositório não existirem.
   - Arquivos previstos:
