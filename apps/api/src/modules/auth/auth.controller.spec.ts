@@ -1,10 +1,13 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
+import { AllExceptionsFilter } from '../../common/filters/all-exceptions.filter.js';
+import { TransformInterceptor } from '../../common/interceptors/transform.interceptor.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { AuthModule } from './auth.module.js';
 
@@ -51,7 +54,21 @@ describe('AuthController (e2e)', () => {
   beforeEach(async () => {
     prisma = createPrismaMock();
 
-    const moduleRef = await Test.createTestingModule({ imports: [AuthModule] })
+    const moduleRef = await Test.createTestingModule({
+      imports: [AuthModule],
+      providers: [
+        { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+        { provide: APP_FILTER, useClass: AllExceptionsFilter },
+        {
+          provide: APP_PIPE,
+          useValue: new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true,
+          }),
+        },
+      ],
+    })
       .overrideProvider(PrismaService)
       .useValue(prisma)
       .overrideProvider(ConfigService)
@@ -61,13 +78,6 @@ describe('AuthController (e2e)', () => {
     jwtService = moduleRef.get(JwtService);
 
     app = moduleRef.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
     await app.init();
   });
 
@@ -90,13 +100,13 @@ describe('AuthController (e2e)', () => {
       .send(validPayload)
       .expect(201);
 
-    expect(response.body).toEqual({
+    expect(response.body.data).toEqual({
       id: 'user-1',
       name: validPayload.name,
       email: validPayload.email,
       createdAt: createdAt.toISOString(),
     });
-    expect(response.body).not.toHaveProperty('passwordHash');
+    expect(response.body.data).not.toHaveProperty('passwordHash');
   });
 
   it('POST /auth/register returns a conflict for an e-mail already in use', async () => {
@@ -113,7 +123,7 @@ describe('AuthController (e2e)', () => {
       .send(validPayload)
       .expect(409);
 
-    expect(response.body.message).toBe('E-mail já está em uso.');
+    expect(response.body.erro).toBe('E-mail já está em uso.');
     expect(prisma.user.create).not.toHaveBeenCalled();
   });
 
@@ -123,7 +133,7 @@ describe('AuthController (e2e)', () => {
       .send({ name: '', email: '', password: '' })
       .expect(400);
 
-    expect(response.body.message).toEqual(
+    expect(response.body.erro).toEqual(
       expect.arrayContaining([
         'Nome é obrigatório.',
         'E-mail é obrigatório.',
@@ -138,7 +148,7 @@ describe('AuthController (e2e)', () => {
       .send({ ...validPayload, email: 'not-an-email' })
       .expect(400);
 
-    expect(response.body.message).toContain('E-mail inválido.');
+    expect(response.body.erro).toContain('E-mail inválido.');
   });
 
   it('POST /auth/register rejects a weak password', async () => {
@@ -147,7 +157,7 @@ describe('AuthController (e2e)', () => {
       .send({ ...validPayload, password: 'weakpass' })
       .expect(400);
 
-    expect(response.body.message).toContain(
+    expect(response.body.erro).toContain(
       'A senha deve ter no mínimo 8 caracteres, com ao menos 1 letra maiúscula, 1 número e 1 caractere especial.',
     );
   });
@@ -167,12 +177,12 @@ describe('AuthController (e2e)', () => {
       .send({ email: validPayload.email, password: validPayload.password })
       .expect(200);
 
-    expect(response.body).toEqual({
+    expect(response.body.data).toEqual({
       accessToken: expect.any(String),
       expiresIn: 3600,
     });
 
-    const payload = await jwtService.verifyAsync(response.body.accessToken as string);
+    const payload = await jwtService.verifyAsync(response.body.data.accessToken as string);
     expect(payload).toMatchObject({ sub: 'user-1' });
   });
 
@@ -191,7 +201,7 @@ describe('AuthController (e2e)', () => {
       .send({ email: validPayload.email, password: validPayload.password })
       .expect(200);
 
-    const decoded = jwtService.decode(response.body.accessToken as string) as {
+    const decoded = jwtService.decode(response.body.data.accessToken as string) as {
       iat: number;
       exp: number;
     };
@@ -207,7 +217,7 @@ describe('AuthController (e2e)', () => {
       .send({ email: 'missing@example.com', password: validPayload.password })
       .expect(401);
 
-    expect(response.body.message).toBe('Credenciais inválidas');
+    expect(response.body.erro).toBe('Credenciais inválidas');
   });
 
   it('POST /auth/login rejects a wrong password with the same generic message', async () => {
@@ -225,6 +235,6 @@ describe('AuthController (e2e)', () => {
       .send({ email: validPayload.email, password: 'weakpass' })
       .expect(401);
 
-    expect(response.body.message).toBe('Credenciais inválidas');
+    expect(response.body.erro).toBe('Credenciais inválidas');
   });
 });
